@@ -1,0 +1,24 @@
+name: Delete feature branches after release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  delete-feature-branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete merged PR branches with 'delete-on-release' label
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          prs=$(gh pr list --state merged --label delete-on-release --json headRefName --jq '.[].headRefName')
+          for branch in $prs; do
+            if git ls-remote --exit-code --heads origin "$branch"; then
+              echo "Deleting branch: $branch"
+              git push origin --delete "$branch"
+            else
+              echo "Branch $branch not found on remote, skipping."
+            fi
+          done
