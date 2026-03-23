@@ -8,6 +8,7 @@ jobs:
   delete-feature-branches:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Delete merged PR branches with 'delete-on-release' label
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
